@@ -13,6 +13,7 @@
     <property name="show_sql">false</property>
 
     <mapping class="com.abanoub.models.Employee"/>
+    <mapping class="com.abanoub.models.Student"/>
     <!-- <mapping class="package.ModelClassName" /> -->
 
   </session-factory>
