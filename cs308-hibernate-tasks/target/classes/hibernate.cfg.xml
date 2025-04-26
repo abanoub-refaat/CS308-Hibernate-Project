@@ -9,11 +9,18 @@
     <property name="connection.username">system</property>
     <property name="connection.password">system</property>
     <property name="dialect">org.hibernate.dialect.Oracle8iDialect</property>
+    <property name="hibernate.cache.use_second_level_cache">true</property>
+    <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+    <property name="enable_lazy_load_no_trans">true</property>
 
-    <property name="show_sql">false</property>
+    <property name="show_sql">true</property>
 
     <mapping class="com.abanoub.models.Employee"/>
     <mapping class="com.abanoub.models.Student"/>
+    <mapping class="com.abanoub.models.Actor"/>
+    <mapping class="com.abanoub.models.Movie"/>
+    <mapping class="com.abanoub.models.City"/>
+    <mapping class="com.abanoub.models.Address"/>
     <!-- <mapping class="package.ModelClassName" /> -->
 
   </session-factory>

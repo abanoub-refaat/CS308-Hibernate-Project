@@ -4,6 +4,14 @@ import com.abanoub.models.Employee;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import java.util.ArrayList;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import org.hibernate.query.Query;
+import com.abanoub.criteria.FilterQuery;
+import com.abanoub.criteria.Operator;
 
 public class DBEmployee {
 
@@ -96,5 +104,35 @@ public class DBEmployee {
             }
             System.err.println(ex.getMessage());
         }
+    }
+
+    public List<Employee> getByFilter(List<FilterQuery> filterQueries) {
+
+        try (Session session = DBConfig.SESSION_FACTORY.openSession()) {
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Employee> cr = cb.createQuery(Employee.class);
+            Root<Employee> root = cr.from(Employee.class);
+            // cr.select(root);
+
+            Predicate[] predicates = new Predicate[filterQueries.size()];
+            for (int i = 0; i < filterQueries.size(); i++) {
+                if (filterQueries.get(i).getOp() == Operator.EQ) {
+                    predicates[i] = cb.equal(root.get(filterQueries.get(i).getAttributeName()),
+                            filterQueries.get(i).getAttributeValue());
+                } else if (filterQueries.get(i).getOp() == Operator.GT) {
+                    predicates[i] = cb.gt(root.get(filterQueries.get(i).getAttributeName()),
+                            (Integer) filterQueries.get(i).getAttributeValue());
+                }
+            }
+            cr.select(root).where(predicates);
+            Query<Employee> query = session.createQuery(cr);
+            return query.getResultList();
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+
+        return new ArrayList<>();
     }
 }
