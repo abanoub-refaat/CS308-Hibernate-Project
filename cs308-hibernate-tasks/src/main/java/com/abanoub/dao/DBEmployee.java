@@ -107,32 +107,65 @@ public class DBEmployee {
     }
 
     public List<Employee> getByFilter(List<FilterQuery> filterQueries) {
-
         try (Session session = DBConfig.SESSION_FACTORY.openSession()) {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Employee> cr = cb.createQuery(Employee.class);
             Root<Employee> root = cr.from(Employee.class);
-            // cr.select(root);
 
-            Predicate[] predicates = new Predicate[filterQueries.size()];
-            for (int i = 0; i < filterQueries.size(); i++) {
-                if (filterQueries.get(i).getOp() == Operator.EQ) {
-                    predicates[i] = cb.equal(root.get(filterQueries.get(i).getAttributeName()),
-                            filterQueries.get(i).getAttributeValue());
-                } else if (filterQueries.get(i).getOp() == Operator.GT) {
-                    predicates[i] = cb.gt(root.get(filterQueries.get(i).getAttributeName()),
-                            (Integer) filterQueries.get(i).getAttributeValue());
+            List<Predicate> predicates = new ArrayList<>();
+
+            for (FilterQuery fq : filterQueries) {
+                String attributeName = fq.getAttributeName();
+                Object value = fq.getAttributeValue();
+                Operator op = fq.getOp();
+
+                if (attributeName == null || value == null || op == null)
+                    continue;
+
+                switch (op) {
+                    case EQ:
+                        predicates.add(cb.equal(root.get(attributeName), value));
+                        break;
+                    case GT:
+                        if (value instanceof Number) {
+                            predicates.add(cb.gt(root.get(attributeName), (Number) value));
+                        }
+                        break;
+                    case LT:
+                        if (value instanceof Number) {
+                            predicates.add(cb.lt(root.get(attributeName), (Number) value));
+                        }
+                        break;
+                    // case GTE:
+                    // if (value instanceof Number) {
+                    // predicates.add(cb.ge(root.get(attributeName), (Number) value));
+                    // }
+                    // break;
+                    case LTE:
+                        if (value instanceof Number) {
+                            predicates.add(cb.le(root.get(attributeName), (Number) value));
+                        }
+                        break;
+                    // case LIKE:
+                    // if (value instanceof String) {
+                    // predicates.add(cb.like(root.get(attributeName), "%" + value + "%"));
+                    // }
+                    // break;
+                    default:
+                        break;
                 }
             }
-            cr.select(root).where(predicates);
+
+            cr.select(root).where(cb.and(predicates.toArray(new Predicate[0])));
             Query<Employee> query = session.createQuery(cr);
             return query.getResultList();
 
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return new ArrayList<>();
     }
+
 }
