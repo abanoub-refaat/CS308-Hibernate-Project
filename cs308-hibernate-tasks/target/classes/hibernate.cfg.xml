@@ -15,12 +15,8 @@
 
     <property name="show_sql">true</property>
 
-    <mapping class="com.abanoub.models.Employee"/>
-    <mapping class="com.abanoub.models.Student"/>
-    <mapping class="com.abanoub.models.Actor"/>
-    <mapping class="com.abanoub.models.Movie"/>
-    <mapping class="com.abanoub.models.City"/>
-    <mapping class="com.abanoub.models.Address"/>
+    <mapping class="com.abanoub.models.Blog"/>
+    <mapping class="com.abanoub.models.Comment"/>
     <!-- <mapping class="package.ModelClassName" /> -->
 
   </session-factory>
